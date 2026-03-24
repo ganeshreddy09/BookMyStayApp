@@ -1,118 +1,54 @@
 import java.util.*;
 
-class BookingRequest {
+class Reservation {
     String guestName;
     String roomType;
-    // Represents an add-on service
-    class AddOnService {
-        String serviceName;
-        double cost;
 
-        AddOnService(String serviceName, double cost) {
-            this.serviceName = serviceName;
-            this.cost = cost;
+    Reservation(String guestName, String roomType) {
+        this.guestName = guestName;
+        this.roomType = roomType;
+    }
+}
+
+class BookingHistory {
+
+    private List<Reservation> reservations = new ArrayList<>();
+
+    public void addReservation(Reservation reservation) {
+        reservations.add(reservation);
+    }
+
+    public List<Reservation> getReservations() {
+        return reservations;
+    }
+}
+
+class BookingReportService {
+
+    public void generateReport(List<Reservation> reservations) {
+
+        System.out.println("Booking History and Reporting\n");
+        System.out.println("Booking History Report");
+
+        for (Reservation r : reservations) {
+            System.out.println("Guest: " + r.guestName + ", Room Type: " + r.roomType);
         }
+    }
+}
 
-        BookingRequest(String guestName, String roomType) {
-            this.guestName = guestName;
-            this.roomType = roomType;
-            public double getCost() {
-                return cost;
-            }
-        }
+class BookStayApp {
 
-        class BookStayApp{
+    public static void main(String[] args) {
 
-            // Queue for FIFO booking processing
-            private Queue<BookingRequest> bookingQueue = new LinkedList<>();
+        BookingHistory history = new BookingHistory();
 
-            // Set to ensure unique room IDs
-            private Set<String> allocatedRooms = new HashSet<>();
+        history.addReservation(new Reservation("Abhi", "Single"));
+        history.addReservation(new Reservation("Subha", "Double"));
+        history.addReservation(new Reservation("Vanmathi", "Suite"));
 
-            // Map room type -> allocated room IDs
-            private Map<String, Set<String>> roomTypeMap = new HashMap<>();
-            // Manages add-on services for reservations
-            class AddOnServiceManager {
+        // Generate report
+        BookingReportService reportService = new BookingReportService();
+        reportService.generateReport(history.getReservations());
+    }
 
-                // Track room numbers per type
-                private Map<String, Integer> roomCounter = new HashMap<>();
-                // Map: Reservation ID -> List of services
-                private Map<String, List<AddOnService>> reservationServices = new HashMap<>();
-
-                public void addBooking(String guest, String roomType) {
-                    bookingQueue.add(new BookingRequest(guest, roomType));
-                    // Add service to a reservation
-                    public void addService(String reservationId, AddOnService service) {
-                        reservationServices
-                                .computeIfAbsent(reservationId, k -> new ArrayList<>())
-                                .add(service);
-                    }
-
-                    private String generateRoomId(String roomType) {
-                        // Calculate total cost of services for a reservation
-                        public double calculateTotalCost(String reservationId) {
-
-                            int count = roomCounter.getOrDefault(roomType, 0) + 1;
-                            roomCounter.put(roomType, count);
-                            double total = 0;
-
-                            String roomId = roomType + "-" + count;
-                            List<AddOnService> services = reservationServices.get(reservationId);
-
-                            allocatedRooms.add(roomId);
-
-                            roomTypeMap
-                                    .computeIfAbsent(roomType, k -> new HashSet<>())
-                                    .add(roomId);
-                            if (services != null) {
-                                for (AddOnService s : services) {
-                                    total += s.getCost();
-                                }
-                            }
-
-                            return roomId;
-                            return total;
-                        }
-                    }
-
-                    public void processBookings() {
-
-                        System.out.println("Room Allocation Processing");
-
-                        while (!bookingQueue.isEmpty()) {
-                            class BookStayApp {
-
-                                BookingRequest request = bookingQueue.poll();
-                                public static void main(String[] args) {
-
-                                    String roomId = generateRoomId(request.roomType);
-                                    AddOnServiceManager manager = new AddOnServiceManager();
-
-                                    System.out.println(
-                                            "Booking confirmed for Guest: " +
-                                                    request.guestName +
-                                                    ", Room ID: " +
-                                                    roomId
-                                    );
-                                }
-                            }
-
-                            public static void main(String[] args) {
-                                String reservationId = "Single-1";
-
-                                BookStayApp service = new BookStayApp();
-                                // Guest selects services
-                                manager.addService(reservationId, new AddOnService("Breakfast", 500));
-                                manager.addService(reservationId, new AddOnService("Airport Pickup", 1000));
-
-                                service.addBooking("Abhi", "Single");
-                                service.addBooking("Shlok", "Single");
-                                service.addBooking("Vani", "Suite");
-                                double totalCost = manager.calculateTotalCost(reservationId);
-
-                                service.processBookings();
-                                System.out.println("Add-On Service Selection");
-                                System.out.println("Reservation ID: " + reservationId);
-                                System.out.println("Total Add-On Cost: " + totalCost);
-                            }
-                        }
+}
